@@ -2,20 +2,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# =======================
-# SETTINGS (sesuaikan jika perlu)
-# =======================
+
 CSV_PATH = "Single Phase Full Bridge Filtered.csv"
 
-F0_HZ  = 60.0         # fundamental
-FSW_HZ = 10_000.0     # switching/carrier
+F0_HZ  = 60.0        
+FSW_HZ = 10_000.0     
 
 # ambil steady-state
 N_CYCLES_STEADY = 20
 
 # resampling
-FS_LOW  = 20_000      # cukup untuk low FFT
-FS_HIGH = 200_000     # cukup untuk lihat 10 kHz (Nyquist 100 kHz)
+FS_LOW  = 20_000     
+FS_HIGH = 200_000  
 
 # plot/FFT windows
 N_CYCLES_PLOT     = 1
@@ -26,7 +24,6 @@ N_CYCLES_FFT_HIGH = 20
 LOW_FMAX_HZ = 200
 SW_SPAN_HZ  = 25_000
 
-# Optional: isi jika kamu tahu nama kolomnya
 TIME_COL = None
 SIG_COL  = None
 
@@ -40,7 +37,6 @@ def pick_time_col(df):
     return df.columns[0]
 
 def pick_signal_col(df, time_col):
-    # pilih kolom numeric selain time dengan amplitude terbesar
     candidates = []
     for c in df.columns:
         if c == time_col:
@@ -74,7 +70,6 @@ def resample_uniform(t, x, fs, t_start, t_end):
     return t_u, x_u
 
 def fft_mag_peak(x, fs):
-    # magnitude ~ Vpeak dengan Hann window
     x = x - np.mean(x)
     N = len(x)
     if N < 128:
@@ -83,8 +78,8 @@ def fft_mag_peak(x, fs):
     X = np.fft.rfft(x * w)
     f = np.fft.rfftfreq(N, d=1/fs)
 
-    cg = np.mean(w)                 # coherent gain Hann
-    mag = (2.0/(N*cg)) * np.abs(X)  # ~Vpeak
+    cg = np.mean(w)               
+    mag = (2.0/(N*cg)) * np.abs(X) 
     mag[0] *= 0.5
     return f, mag
 
@@ -178,3 +173,4 @@ plt.title(f"FFT Switching Band (Filtered) around {FSW_HZ/1000:.1f} kHz (±{SW_SP
 plt.grid(True)
 
 plt.show()
+
