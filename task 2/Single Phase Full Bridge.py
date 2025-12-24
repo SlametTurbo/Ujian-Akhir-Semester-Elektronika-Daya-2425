@@ -7,39 +7,39 @@ import matplotlib.pyplot as plt
 # =======================
 CSV_PATH = "Single Phase Full Bridge Inverter Output.csv"
 
-# Kalau kamu tahu nama kolomnya, isi di sini (contoh: "Vab", "Vm1:Measured voltage", dll)
-SIG_COL = None          # None = auto-detect
-TIME_COL = None         # None = auto-detect (biasanya "Time / s")
+
+SIG_COL = None        
+TIME_COL = None       
 
 F0_HZ = 60.0            # sine fundamental
-FSW_HZ = 10_000.0       # ganti sesuai carrier kamu (mis. 10e3 atau 100e3)
+FSW_HZ = 10_000.0       
 
 # Resampling rates
-FS_LOW  = 20_000        # cukup untuk harmonik fundamental
-FS_HIGH = 1_000_000     # untuk switching band (pastikan > 2*FSW_HZ)
+FS_LOW  = 20_000      
+FS_HIGH = 1_000_000    
 
 # Window length
 N_CYCLES_PLOT = 1
 N_CYCLES_FFT_LOW  = 20
-N_CYCLES_FFT_HIGH = 10   # kalau FSW 10 kHz, 10 cycle masih aman
+N_CYCLES_FFT_HIGH = 10   
 
 # Plot limits
 LOW_FMAX = 5_000
-SW_SPAN  = 20_000        # plot f_sw ± span (Hz)
+SW_SPAN  = 20_000       
 
 # =======================
 # HELPERS
 # =======================
 def pick_time_col(df):
-    # cari kolom yang mengandung "time"
+
     for c in df.columns:
         if "time" in c.lower():
             return c
-    # fallback: kolom pertama
+
     return df.columns[0]
 
 def pick_signal_col(df, time_col):
-    # ambil kolom numeric selain time
+
     num_cols = []
     for c in df.columns:
         if c == time_col:
@@ -51,7 +51,7 @@ def pick_signal_col(df, time_col):
     if not num_cols:
         raise ValueError("Tidak menemukan kolom numeric untuk sinyal tegangan.")
 
-    # pilih yang amplitude-nya paling besar (umumnya output inverter)
+
     best = None
     best_score = -np.inf
     for c in num_cols:
@@ -87,8 +87,8 @@ def fft_mag_peak(x, fs):
     X = np.fft.rfft(x * w)
     f = np.fft.rfftfreq(N, d=1/fs)
 
-    cg = np.mean(w)                 # coherent gain Hann
-    mag = (2.0/(N*cg)) * np.abs(X)  # ~Vpeak
+    cg = np.mean(w)               
+    mag = (2.0/(N*cg)) * np.abs(X) 
     mag[0] *= 0.5
     return f, mag
 
@@ -106,7 +106,7 @@ if SIG_COL is None:
 t = pd.to_numeric(df[TIME_COL], errors="coerce").to_numpy(float)
 x = pd.to_numeric(df[SIG_COL], errors="coerce").to_numpy(float)
 
-# bersihkan NaN
+
 m = np.isfinite(t) & np.isfinite(x)
 t = t[m]
 x = x[m]
@@ -165,3 +165,4 @@ plt.title(f"FFT (Switching band) around {FSW_HZ/1000:.1f} kHz, Fs={FS_HIGH} Hz")
 plt.grid(True)
 
 plt.show()
+
